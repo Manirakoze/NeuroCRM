@@ -1,6 +1,6 @@
 import { createElement } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Building2, FileSpreadsheet, LayoutDashboard, UsersRound } from "lucide-react";
+import { Building2, FileSpreadsheet, LayoutDashboard, Link2, UsersRound } from "lucide-react";
 
 export default function Sidebar() {
   const { pathname } = useLocation();
@@ -10,6 +10,7 @@ export default function Sidebar() {
     { to: "/clients", label: "Clients", icon: UsersRound },
     { to: "/families", label: "Families", icon: Building2 },
     { to: "/reports", label: "FCD reports", icon: FileSpreadsheet },
+    { to: "/enrollments", label: "Enrollments", icon: Link2 },
   ];
 
   return (

@@ -12,6 +12,10 @@ const initialData = {
     { id: "client-3", firstName: "Noah", lastName: "Mitchell", dateOfBirth: "2014-11-22", status: "Waitlist", familyId: "family-1", notes: "Initial consultation booked." },
   ],
   reports: [],
+  enrollmentLinks: [
+    { id: "intake-general", program: "General intake", active: true, createdAt: "2026-09-27T00:00:00.000Z" },
+  ],
+  enrollments: [],
 };
 
 function readData() {
@@ -118,4 +122,46 @@ export async function deleteReport(id) {
   const records = readData();
   records.reports = (records.reports || []).filter((report) => report.id !== id);
   writeData(records);
+}
+
+export async function getEnrollmentLinks() {
+  return readData().enrollmentLinks || [];
+}
+
+export async function createEnrollmentLink(program) {
+  const records = readData();
+  const link = { id: newId("enroll"), program: program.trim(), active: true, createdAt: new Date().toISOString() };
+  records.enrollmentLinks = records.enrollmentLinks || [];
+  records.enrollmentLinks.unshift(link);
+  writeData(records);
+  return link;
+}
+
+export async function getEnrollmentLink(id) {
+  return (readData().enrollmentLinks || []).find((link) => link.id === id && link.active) || null;
+}
+
+export async function getEnrollments() {
+  return readData().enrollments || [];
+}
+
+export async function submitEnrollment(linkId, data) {
+  const records = readData();
+  const link = (records.enrollmentLinks || []).find((record) => record.id === linkId && record.active);
+  if (!link) throw new Error("This enrollment link is unavailable.");
+
+  const normalizedEmail = data.parentEmail.trim().toLowerCase();
+  let family = records.families.find((record) => record.email.toLowerCase() === normalizedEmail);
+  if (!family) {
+    family = { id: newId("family"), primaryContactName: data.parentName.trim(), email: normalizedEmail, phone: data.parentPhone.trim() };
+    records.families.unshift(family);
+  }
+
+  const client = { id: newId("client"), firstName: data.childFirstName.trim(), lastName: data.childLastName.trim(), dateOfBirth: data.dateOfBirth, status: "Waitlist", familyId: family.id, notes: `Enrollment: ${link.program}` };
+  records.clients.unshift(client);
+  const enrollment = { id: newId("enrollment"), linkId, program: link.program, parentName: family.primaryContactName, parentEmail: family.email, childName: `${client.firstName} ${client.lastName}`, clientId: client.id, consent: true, status: "Submitted", submittedAt: new Date().toISOString() };
+  records.enrollments = records.enrollments || [];
+  records.enrollments.unshift(enrollment);
+  writeData(records);
+  return enrollment;
 }
