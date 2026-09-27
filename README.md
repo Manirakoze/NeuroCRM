@@ -1,4 +1,23 @@
-# React + Vite
+# NeuroCRM
+
+## Development
+
+```bash
+npm install
+npm run dev
+```
+
+The app works in local demo mode until Supabase environment variables are configured.
+
+## Supabase production setup
+
+1. Create a Supabase project in the Canadian region closest to your operations.
+2. In the Supabase SQL Editor, run [001_initial_schema.sql](supabase/migrations/001_initial_schema.sql).
+3. Copy `.env.example` to `.env` and enter the project URL and publishable key from Supabase.
+4. Create the first staff user in Supabase Authentication, then insert its user ID, name, and `admin` role into `public.profiles`.
+5. Configure a secure server-side enrollment endpoint to call `submit_enrollment`; it is the approved public write path.
+
+Never put a Supabase service-role key in the frontend environment file. It bypasses row-level security.
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
