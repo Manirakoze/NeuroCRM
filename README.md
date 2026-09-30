@@ -12,7 +12,7 @@ The app works in local demo mode until Supabase environment variables are config
 ## Supabase production setup
 
 1. Create a Supabase project in the Canadian region closest to your operations.
-2. In the Supabase SQL Editor, run [001_initial_schema.sql](supabase/migrations/001_initial_schema.sql), then [002_auth_and_public_enrollment.sql](supabase/migrations/002_auth_and_public_enrollment.sql).
+2. In the Supabase SQL Editor, run [001_initial_schema.sql](supabase/migrations/001_initial_schema.sql), then [002_auth_and_public_enrollment.sql](supabase/migrations/002_auth_and_public_enrollment.sql). If you created a user before running migration 002, also run [003_backfill_profiles.sql](supabase/migrations/003_backfill_profiles.sql).
 3. Copy `.env.example` to `.env` and enter the project URL and publishable key from Supabase.
 4. Create the first staff user in Supabase Authentication. The profile trigger creates its staff profile automatically; promote it to admin with `update public.profiles set role = 'admin' where id = 'USER_UUID';`.
 5. Configure a secure server-side enrollment endpoint to call `submit_enrollment`; it is the approved public write path.
