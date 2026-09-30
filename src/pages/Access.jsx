@@ -5,11 +5,12 @@ export default function Access({ onAuthenticate }) {
   const [mode, setMode] = useState("signin");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
-  const submit = (event) => {
+  const submit = async (event) => {
     event.preventDefault();
-    const result = onAuthenticate({ mode, name, email });
+    const result = await onAuthenticate({ mode, name, email, password });
     setMessage(result || "");
   };
 
@@ -26,6 +27,7 @@ export default function Access({ onAuthenticate }) {
         <form onSubmit={submit} className="access-form">
           {mode === "register" && <label>Full name<input value={name} onChange={(event) => setName(event.target.value)} required autoComplete="name" /></label>}
           <label>Email address<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required autoComplete="email" /></label>
+          <label>Password<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required minLength="6" autoComplete={mode === "signin" ? "current-password" : "new-password"} /></label>
           {message && <p className="form-message">{message}</p>}
           <button className="primary-button access-submit">{mode === "signin" ? "Enter CRM" : "Create account"} <ArrowRight size={17} /></button>
         </form>

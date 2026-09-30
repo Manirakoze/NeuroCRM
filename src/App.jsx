@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import MainLayout from "./layout/MainLayout";
 import Dashboard from "./pages/Dashboard";
@@ -8,17 +8,25 @@ import Reports from "./pages/Reports";
 import Access from "./pages/Access";
 import Enrollment from "./pages/Enrollment";
 import Enrollments from "./pages/Enrollments";
-import { getAccount, registerAccount, signInAccount } from "./services/api";
+import { getSessionAccount, onAccountChange, registerUser, signInUser } from "./services/api";
 
 export default function App() {
-  const [account, setAccount] = useState(getAccount);
+  const [account, setAccount] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const authenticate = ({ mode, name, email }) => {
-    const authenticatedAccount = mode === "register" ? registerAccount({ name, email }) : signInAccount(email);
-    if (!authenticatedAccount) return "No local account found for this email. Create one first.";
-    setAccount(authenticatedAccount);
-    return "";
+  useEffect(() => {
+    getSessionAccount().then(setAccount).finally(() => setIsLoading(false));
+    return onAccountChange(setAccount);
+  }, []);
+
+  const authenticate = async ({ mode, name, email, password }) => {
+    const result = mode === "register" ? await registerUser({ name, email, password }) : await signInUser({ email, password });
+    if (result.account) setAccount(result.account);
+    if (!result.account && !result.message && mode === "signin") return "No local account found for this email. Create one first.";
+    return result.message;
   };
+
+  if (isLoading) return null;
 
   return (
     <BrowserRouter>
